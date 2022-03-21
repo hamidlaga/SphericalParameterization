@@ -1,0 +1,198 @@
+function M = makeSphericalMap(S, sphS, N, Ix)
+%
+% N - resolution of the spherical map (the final map will be of res. N x N
+% S - the mesh
+% sphS - vertices of S embedded on the sphere
+% Ix - landmark indices
+%
+%
+% Output: M - (N+1) x (N+1) x 3  (\phi \times \theta)  (compatible with
+% Sebastian's convention)
+%  \phi: 0 to 2\pi
+%  \theta: 0 to \pi
+%%
+
+% %%
+% 2. Create a spherical grid
+if nargin < 3,
+    N = 128;
+end
+
+% theta = pi*[0:N]/N;
+% Theta = repmat(theta,N+1,1);
+% phi = 2*pi*[0:N]/(N);
+% Phi = repmat(phi',1, N+1);
+
+[Theta, Phi] = getSphericalGrid(N);
+
+N = size(Theta, 1); % should be 129
+
+[X, Y, Z] = spherical_to_cart(Theta, Phi, 1); %radius 1
+
+% size(X)
+% figure(10), hold on;
+% for i=1:size(X, 2),
+%     x = X(:, i);
+%     y = Y(:, i);
+%     z = Z(:, i);
+%     plot3(x, y, z, 'x'); axis equal;
+%     pause
+% end
+
+% vr = [1 ;0 ;.1];
+% vr = vr / norm(vr);
+% Np = [X(1, 1); Y(1, 1); Z(1, 1)];         % north pole
+% x = cross(vr, Np) / norm(cross(vr, Np));
+% theta = acos(dot(vr, Np));
+% A = [0, -x(3) x(2); ...
+%      x(3) 0 -x(1); ...
+%      -x(2) x(1) 0];
+% O = eye(3, 3) + sin(theta) * A + (1 - cos(theta))*A*A; 
+% O = O';
+% det(O)
+% %O = getRotation([0, 0, pi+ pi/2 + pi/3]);
+% for i=1:size(X, 1),
+%     for j=1:size(X, 2),
+%         p = O * [X(i, j); Y(i, j); Z(i, j)];
+%         X(i, j) = p(1);
+%         Y(i, j) = p(2);
+%         Z(i, j) = p(3);
+%     end
+% end
+
+
+% % plot the mesh
+% figure(20), clf
+% plot_mesh(sphS.V', sphS.Tri'); 
+% colormap jet(256);
+% hold on;
+% 
+% % plot the sampled sphere
+% plot3(X, Y, Z, 'xr');
+% 
+% pause
+%%
+% 3. Compute the parameterization
+% 3.1. Intersect the rays (X, Y, Z) with the spherical mesh
+%      The output should be the triangle + barycentric coords of the intersection point 
+% Let fIdx the indices of the intersection faces
+%     BCC the bcc coords
+
+option=[]; 
+option.triangle = 'one sided'; 
+option.ray      = 'ray';
+option.border   = 'normal';
+
+
+%sphS.Tri = [sphS.Tri(3, :); sphS.Tri(2, :); sphS.Tri(1, :)];
+
+V1 = sphS.V(:, sphS.Tri(1, :))';
+V2 = sphS.V(:, sphS.Tri(2, :))';
+V3 = sphS.V(:, sphS.Tri(3, :))';
+
+fIdx = zeros(size(X)); % zeros(numel(X), 1);
+BCC  = zeros(size(X, 1), size(X, 2), 3); % zeros(numel(X), 3);
+
+nFaces  = size(V1, 1);
+
+% X = X(:);
+% Y = Y(:);
+% Z = Z(:);
+
+M = zeros(N, N, 3);
+
+for i=1:size(X, 1), %numel(X),
+   % disp(i);
+   for j=1:size(X, 2),
+       % v0 = [X(i) Y(i) Z(i)]; 
+        v0 = [X(i, j) Y(i, j) Z(i, j)]; 
+
+       [intersect  t u v] = TriangleRayIntersection( zeros(nFaces, 3), repmat(v0, nFaces, 1), V1, V2, V3, option);
+
+       ix = find(intersect > 0); 
+       if numel(ix) == 1,       
+          fIdx(i, j) = ix(1);
+          BCC(i,j, :) = [(1-u(ix(1))-v(ix(1))) u(ix(1)) v(ix(1)) ];
+       else
+          %numel(ix)
+    %       intersect
+    %       pause
+          fIdx(i, j) = 1;
+
+       end
+       
+       % set P and M
+       M(i, j, :) = BCC(i, j, 1) * S.V(:, S.Tri(1, fIdx(i, j)) ) +  ...
+                    BCC(i, j, 2) * S.V(:, S.Tri(2, fIdx(i, j)) ) +  ...
+                    BCC(i, j, 3) * S.V(:, S.Tri(3, fIdx(i, j)) );
+      M(i, j, :) =  M(i, j, :) / sum(B(i, j, :), 3);
+      
+    end
+end
+
+% 3.2. Get the 3D coords of the intersection point in the original mesh
+% M = zeros(N, N, 3);
+P = repmat(BCC(:, 1)', 3, 1) .* S.V(:, S.Tri(1, fIdx) ) + repmat(BCC(:, 2)', 3, 1) .* S.V(:, S.Tri(2, fIdx) )  + repmat(BCC(:, 3)', 3, 1) .*  S.V(:, S.Tri(3, fIdx) );
+
+for i=1:size(P, 2)
+    P(:, i) = P(:, i) / sum(BCC(i, :));
+end
+
+for i=1:3,
+    M(:, :, i) = reshape(P(i, :)', N, N);       % maybe in this reshape ??
+end
+
+
+%% visualize the landmarks
+P = sphS.V(:, Ix);        % the 3D coordinates on the sphere of the landmarks
+
+% convert the landmarks into spherical coordinates
+[landmarksTheta, landmarksPhi, ~] = cartesian_to_sph(P(1,:), P(2, :), P(3, :));
+
+% convert them back to 3D (this is just for test)
+[x y z] = spherical_to_cart(landmarksTheta, landmarksPhi);
+Q       = [x; y; z];
+showSelectedFeatures(sphS, Q, 0.04); 
+
+
+% get the landmark sph coordinates and visualize them on M
+th = Theta(1, :);
+phi= Phi(:, 1)';
+[landmarksTheta, landmarksPhi, ~] = cartesian_to_sph(P(1, :), P(2, :), P(3, :));
+
+% Phi index  (Row index in Sebastian's convention)
+I0 = floor(landmarksPhi / phi(2))+1; 
+
+% Theta index  (column in Sebastian's convention)
+J0 = floor( landmarksTheta / th(2))+1; 
+  
+% % convert them back to 3D (this is just for test)  -  (working fine)
+% [x y z] = spherical_to_cart((J0 - 1)*th(2), (I0-1)*phi(2));
+% Q       = [x; y; z];
+% showSelectedFeatures(sphS, Q, 0.04); 
+% 
+% pause
+
+
+
+
+
+
+[Xs,Ys,Zs] = sphere(40);
+scale      = 0.015;
+
+figure(17), clf;
+surface(squeeze(M(:, :, 1)), squeeze(M(:, :, 2)), squeeze(M(:, :, 3))); 
+axis equal; cameramenu;
+hold on;
+for k=1:length(J0),
+   
+    i = I0(k);
+    j = J0(k);
+    X = squeeze(M(i, j, :) );           %  
+    
+    surf(Xs*scale + X(1), Ys*scale+X(2), Zs*scale+ X(3),'CData',repmat(k, size(Xs)));
+        
+end
+
+
