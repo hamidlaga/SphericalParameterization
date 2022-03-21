@@ -26,7 +26,7 @@ addpath('./meshIO');
 addpath('./TriangleRayIntersection');
 addpath('./kdtree');
 
-pDir = '..\';
+pDir = '.\';
 dataDir   = [pDir 'sample_data\'];
 
 %% Settung the parameters
