@@ -64,6 +64,8 @@ This code uses some external libraries, which are included here but credit shoul
 
 - Progressive mesh structure, which are part of OpenMesh (https://www.graphics.rwth-aachen.de/software/openmesh/). Please refer to www.openmesh.org and https://www.graphics.rwth-aachen.de/software/openmesh/license/ for the license and copyright.
 
-## Contact
+## Contributors and Contact
+Hamid Laga, Sebastian Kurtek, Eric Klassen, Anuj Srivastava.
 
+For any questions, you can contact hamid.laga@gmail.com. Note that the code is provided as it is and we may not be able to provide support on how to use it and fixing potential bugs.
 For any questions, you can contact `hamid.laga@gmail.com`.
