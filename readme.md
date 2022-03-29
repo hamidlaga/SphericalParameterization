@@ -6,11 +6,11 @@ This code is a non-official implementation of the paper:
 > [**Spherical parametrization and remeshing**](https://hhoppe.com/sphereparam.pdf).
 > ACM Transactions on Graphics (TOG) 22.3 (2003): 340-349.
 
-Note that the parameterization is not conformal. The algorithm, however, is very efficient as it is able to parameterize complex shapes even those with long extruding parts.
+The algorithm is very efficient as it is able to spherically parameterize, with very low distrosion, complex 3D models even those with long extruding parts. It is, however, limited to genus-0 surfaces (as is the case with most of the spherical parameterization algorithms) and requires as input manifold (clean) meshes.  
 
-This code runs only on Windows and requires Matlab. It is standalone and does not require any setup (apart from having Matlab running on Windows).
+The code runs only on Windows and requires Matlab. It is standalone and does not require any setup (apart from having Matlab running on Windows).
 
-Also, note that this code was developed for research purposes and is not meant for commercial use. We also expect that the code may have some bugs and issues. However, while we will be happy to answer some questions, we may not be able to provide full support. 
+This code was developed for research purposes and is not meant for commercial use. We expect that the code may have some bugs and issues. However, while we will be happy to answer some questions, we may not be able to provide support. 
 
 ## Citation
 If you use this code, please make sure you cite: 
@@ -54,6 +54,7 @@ publisher={ACM New York, NY, USA}
 ```
 
 ## How to use the code:
+Start with the script runAllScript.m. The scripts loops through the 3D models in the folder "sample_data" and generates their spherical parameterizations. Note that the four sample 3D models in the folder "sample_data" are from the [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/), which contains around 400 models in total. Thus, if you use them, make sure you acknowlegde and give credit to [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/). 
 
 ## Licence and Copyright
 Copyright Hamid Laga Date: 2022/03/20.
@@ -62,10 +63,12 @@ This code uses some external libraries, which are included here but credit shoul
 
 - The kdtree library, developed by Andrea Tagliasacchi; see https://www.mathworks.com/matlabcentral/profile/authors/1058872
 
-- Progressive mesh structure, which are part of OpenMesh (https://www.graphics.rwth-aachen.de/software/openmesh/). Please refer to www.openmesh.org and https://www.graphics.rwth-aachen.de/software/openmesh/license/ for the license and copyright.
+- Progressive mesh structure, which is part of OpenMesh (https://www.graphics.rwth-aachen.de/software/openmesh/). Please refer to www.openmesh.org and https://www.graphics.rwth-aachen.de/software/openmesh/license/ for the license and copyright.
 
 ## Contributors and Contact
 Hamid Laga, Sebastian Kurtek, Eric Klassen, Anuj Srivastava.
 
-For any questions, you can contact hamid.laga@gmail.com. Note that the code is provided as it is and we may not be able to provide support on how to use it and fixing potential bugs.
-For any questions, you can contact `hamid.laga@gmail.com`.
+For any questions, you can contact hamid.laga@gmail.com. 
+
+Note that the code was developed for research purposes and is provided as it is. Thus, we may not be able to provide support on how to use it and fix potential bugs.
+
