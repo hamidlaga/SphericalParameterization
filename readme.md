@@ -6,7 +6,7 @@ This code is a non-official implementation of the paper:
 > [**Spherical parametrization and remeshing**](https://hhoppe.com/sphereparam.pdf).
 > ACM Transactions on Graphics (TOG) 22.3 (2003): 340-349.
 
-The algorithm is very efficient as it is able to spherically parameterize, with very low distrosion, complex 3D models even those with long extruding parts. It is, however, limited to genus-0 surfaces (as is the case with most of the spherical parameterization algorithms) and requires as input manifold (clean) meshes.  
+The algorithm is very efficient as it is able to spherically parameterize, with very low distrosion, complex 3D models even those with long extruding parts. It is, however, limited to genus-0 surfaces (as is the case with most of the spherical parameterization algorithms) and works only on manifold (clean) meshes.  
 
 The code runs only on Windows and requires Matlab. It is standalone and does not require any setup (apart from having Matlab running on Windows).
 
@@ -54,7 +54,7 @@ publisher={ACM New York, NY, USA}
 ```
 
 ## How to use the code:
-Start with the script runAllScript.m. The scripts loops through the 3D models in the folder "sample_data" and generates their spherical parameterizations. Note that the four sample 3D models in the folder "sample_data" are from the [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/), which contains around 400 models in total. Thus, if you use them, make sure you acknowlegde and give credit to [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/). 
+Start with the script runAllScript.m. The script loops through the 3D models in the folder "sample_data" and generates their spherical parameterizations. Note that the four sample 3D models in the folder "sample_data" are from the [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/), which contains around 400 models in total. Thus, if you use them, make sure you acknowlegde and give credit to [SHREC2017 Watertight Models](http://watertight.ge.imati.cnr.it/). 
 
 ## Licence and Copyright
 Copyright Hamid Laga Date: 2022/03/20.
